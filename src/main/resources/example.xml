@@ -2,12 +2,12 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite thread-count="2" name="Suite" parallel="tests" >
     <listeners>
-        <listener class-name="com.thiago.core.InvokedMethodListener"></listener>
+        <listener class-name="com.adriano.core.InvokedMethodListener"></listener>
     </listeners>
     <test name="SearchGoogle" parallel="methods" thread-count="6" >
         <parameter name="browser" value="chrome"/>
         <classes>
-            <class name="com.thiago.teste.GoogleSearchTest">
+            <class name="com.adriano.teste.GoogleSearchTest">
                 <methods>
                     <include name="google0" />
                 </methods>
