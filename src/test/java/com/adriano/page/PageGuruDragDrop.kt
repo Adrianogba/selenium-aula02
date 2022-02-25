@@ -9,29 +9,28 @@ import org.openqa.selenium.interactions.Action
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.support.FindBy
 import org.openqa.selenium.support.PageFactory
-import org.openqa.selenium.support.ui.WebDriverWait
 
 class PageGuruDragDrop : CorePage<PageGuruDragDrop>() {
 
     @FindBy(xpath = "//*[@id=\"products\"]/div/ul")
     private val draggables: WebElement? = null
 
-    @FindBy(xpath = "//*[@id=\"amt7\"]")
+    @FindBy(id = "amt7")
     private val debitAmountContainer: WebElement? = null
 
-    @FindBy(xpath = "//*[@id=\"bank\"]")
+    @FindBy(id = "bank")
     private val debitAcountContainer: WebElement? = null
 
-    @FindBy(xpath = "//*[@id=\"loan\"]")
+    @FindBy(id = "loan")
     private val creditAmountContainer: WebElement? = null
 
-    @FindBy(xpath = "//*[@id=\"amt8\"]")
+    @FindBy(id = "amt8")
     private val creditAcountContainer: WebElement? = null
 
-    @FindBy(xpath = "//*[@id=\"equal\"]/a")
+    @FindBy(id = "equal")
     private val successMessage: WebElement? = null
 
-    @FindBy(xpath = "//*[@id=\"e1\"]")
+    @FindBy(id = "e1")
     private val cantMove: WebElement? = null
 
     init {
@@ -63,9 +62,8 @@ class PageGuruDragDrop : CorePage<PageGuruDragDrop>() {
     }
 
     private fun getContainersDraggableCanBeMovedTo(draggable: WebElement): List<WebElement> {
-
         val action = Actions(driver)
-        action.clickAndHold(draggable).moveByOffset(0,20).release().build().perform()
+        action.clickAndHold(draggable).moveByOffset(0,30).build().perform()
         val cannotBeMoved = cantMove?.isDisplayed
 
         if (cannotBeMoved == true) return emptyList()
@@ -80,6 +78,8 @@ class PageGuruDragDrop : CorePage<PageGuruDragDrop>() {
             if (container != null && container.haveClass("content-active"))
                 draggableContainers.add(container)
         }
+        Thread.sleep(50)
+        action.release().build().perform()
 
         return draggableContainers.toList()
 
