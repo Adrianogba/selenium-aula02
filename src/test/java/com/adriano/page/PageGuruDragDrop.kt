@@ -47,21 +47,25 @@ class PageGuruDragDrop : CorePage<PageGuruDragDrop>() {
         draggables.forEach { draggable ->
             getContainersDraggableCanBeMovedTo(draggable).forEach { container ->
                 dragAndDrop = action.clickAndHold(draggable)
-                                .moveToElement(container)
-                                .release()
-                                .build()
+                        .moveToElement(container)
+                        .release()
+                        .build()
                 dragAndDrop.perform()
             }
         }
         return PageGuruDragDrop()
     }
     
-    fun verifySuccess() {
-        val successMessage = successMessage ?: throw NullPointerException()
-        assert(successMessage.text == "Perfect!")
+    fun verifySuccess() = assert(hasFinished())
+
+    private fun hasFinished(): Boolean {
+        val successMessage = successMessage ?: return false
+        return successMessage.text == "Perfect!"
     }
 
     private fun getContainersDraggableCanBeMovedTo(draggable: WebElement): List<WebElement> {
+        if (hasFinished()) return emptyList()
+
         val action = Actions(driver)
         action.clickAndHold(draggable).moveByOffset(0,30).build().perform()
         val cannotBeMoved = cantMove?.isDisplayed
@@ -78,7 +82,7 @@ class PageGuruDragDrop : CorePage<PageGuruDragDrop>() {
             if (container != null && container.haveClass("content-active"))
                 draggableContainers.add(container)
         }
-        Thread.sleep(50)
+        Thread.sleep(100)
         action.release().build().perform()
 
         return draggableContainers.toList()
