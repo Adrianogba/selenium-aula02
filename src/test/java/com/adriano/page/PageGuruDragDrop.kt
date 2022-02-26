@@ -1,6 +1,7 @@
 package com.adriano.page
 
 import com.adriano.core.CorePage
+import com.adriano.core.util.Utils.dragAndHold
 import com.adriano.core.util.Utils.haveClass
 import com.adriano.driver.TLDriverFactory
 import org.openqa.selenium.By
@@ -9,8 +10,14 @@ import org.openqa.selenium.interactions.Action
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.support.FindBy
 import org.openqa.selenium.support.PageFactory
+import org.openqa.selenium.support.ui.WebDriverWait
 
 class PageGuruDragDrop : CorePage<PageGuruDragDrop>() {
+
+    /** DICIONARIO
+     * Draggable = bloquinho a ser movido
+     * Container = bloco onde o bloquinho deve ser movido
+     */
 
     @FindBy(xpath = "//*[@id=\"products\"]/div/ul")
     private val draggables: WebElement? = null
@@ -33,59 +40,110 @@ class PageGuruDragDrop : CorePage<PageGuruDragDrop>() {
     @FindBy(id = "e1")
     private val cantMove: WebElement? = null
 
+    /**
+     * Lista dos containers
+     */
+    private val containers = listOf(
+        debitAmountContainer,
+        debitAcountContainer,
+        creditAmountContainer,
+        creditAcountContainer
+    )
+
     init {
         this.driver = TLDriverFactory.driver
         PageFactory.initElements(this.driver, this)
     }
 
+    /**
+     * Move os draggables aonde for possível
+     */
     fun verifyAndMoveDraggables(): PageGuruDragDrop {
         val draggables = draggables?.findElements(By.tagName("li"))
-                ?: throw NullPointerException()
+            ?: throw NullPointerException()
         val action = Actions(driver)
         lateinit var dragAndDrop: Action
 
         draggables.forEach { draggable ->
             getContainersDraggableCanBeMovedTo(draggable).forEach { container ->
                 dragAndDrop = action.clickAndHold(draggable)
-                        .moveToElement(container)
-                        .release()
-                        .build()
+                    .moveToElement(container)
+                    .release()
+                    .build()
                 dragAndDrop.perform()
             }
         }
         return PageGuruDragDrop()
     }
-    
+
+    /**
+     * Finaliza o teste e printa quanto tempo levou a execução desse teste
+     */
     fun verifySuccess() = assert(hasFinished())
 
+    /**
+     * Informa se o desafio foi concluido
+     */
     private fun hasFinished(): Boolean {
         val successMessage = successMessage ?: return false
         return successMessage.text == "Perfect!"
     }
 
+    /**
+     * Espera até algum container fique disponível a um draggable
+     * ou se surgiu a mensagem onde ele não pode ser movido a nenhum.
+     */
+    private fun waitDraggableInstructions() {
+        val wait = WebDriverWait(driver, 1)
+        try {
+            wait.until {
+                containers.any { it.haveClass("content-active") } || cannotBeMoved
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * Informa se apareceu a mensagem quando um
+     * draggable pode ser movido ou não a algum container
+     */
+    private val cannotBeMoved: Boolean get() = cantMove?.isDisplayed == true
+
+    /**
+     * Retorna para um bloquinho a quais containers
+     * ele pode ser movido antes de ser movido
+     */
     private fun getContainersDraggableCanBeMovedTo(draggable: WebElement): List<WebElement> {
         if (hasFinished()) return emptyList()
 
         val action = Actions(driver)
-        action.clickAndHold(draggable).moveByOffset(0,30).build().perform()
-        val cannotBeMoved = cantMove?.isDisplayed
+        action.dragAndHold(draggable, 0, 1).build().perform()
 
-        if (cannotBeMoved == true) return emptyList()
+        if (cannotBeMoved) return emptyList()
 
         val draggableContainers = mutableListOf<WebElement>()
 
-        listOf(debitAmountContainer,
-            debitAcountContainer,
-            creditAmountContainer,
-            creditAcountContainer
-        ).forEach { container ->
-            if (container != null && container.haveClass("content-active"))
+        containers.forEach { container ->
+            if (container != null
+                && container.haveClass("content-active")
+                && !isDraggableAlreadyInContainer(draggable, container)
+            )
                 draggableContainers.add(container)
         }
-        Thread.sleep(100)
+        waitDraggableInstructions()
         action.release().build().perform()
 
         return draggableContainers.toList()
 
     }
+
+    /**
+     * Verifica se o draggable já existe no container
+     */
+    private fun isDraggableAlreadyInContainer(
+        draggable: WebElement,
+        container: WebElement
+    ): Boolean = container.findElements(By.tagName("li")).any { it.text == draggable.text }
+
 }

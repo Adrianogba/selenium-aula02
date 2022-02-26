@@ -1,18 +1,22 @@
 package com.adriano.core
 
+import com.adriano.core.util.Constants.DEFAULT_TIMEOUT_IN_SECS
+import com.adriano.core.util.Constants.JS_CHECK_PAGE_IS_READY
 import org.openqa.selenium.WebDriver
 import com.adriano.driver.TLDriverFactory
 import org.openqa.selenium.support.PageFactory
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.WebDriverException
 import org.testng.Assert
-import java.lang.Exception
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.By
+import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.NoSuchElementException
+import org.openqa.selenium.TimeoutException
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.support.ui.Select
+import kotlin.Exception
 
 /**
  *
@@ -31,12 +35,21 @@ abstract class CorePage<T> {
 
     fun openPage(clazz: Class<T>?, BASE_URL: String): T {
         val page = PageFactory.initElements(driver, clazz)
-        driver[BASE_URL + url]
-        return page
+        driver[BASE_URL]
+        return returnPageWhenCompletelyLoaded(page)
     }
 
-    val url: String
-        get() = ""
+    private fun returnPageWhenCompletelyLoaded(page: T): T {
+        val wait = WebDriverWait(driver, DEFAULT_TIMEOUT_IN_SECS)
+        val javaScriptExecutor = driver as JavascriptExecutor
+
+        try {
+            wait.until { javaScriptExecutor.executeScript(JS_CHECK_PAGE_IS_READY) }
+        } catch(e: Exception) {
+            throw TimeoutException("Page coudn't be loaded")
+        }
+        return page
+    }
 
     fun preencherCampo(element: WebElement, keysToSend: String?) {
         try {
@@ -101,6 +114,7 @@ abstract class CorePage<T> {
                 val alert = driver.switchTo().alert()
                 alerta = alert.text
             } catch (e: Exception) {
+                e.printStackTrace()
             }
             return alerta
         }

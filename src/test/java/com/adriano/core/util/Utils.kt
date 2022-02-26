@@ -1,19 +1,14 @@
 package com.adriano.core.util
 
-import com.adriano.core.util.Utils.wait
 import com.adriano.driver.TLDriverFactory.driver
-import java.lang.Exception
-import org.openqa.selenium.TakesScreenshot
-import org.openqa.selenium.OutputType
 import org.apache.commons.io.FileUtils
-import org.openqa.selenium.WebDriver
+import org.openqa.selenium.OutputType
+import org.openqa.selenium.TakesScreenshot
 import org.openqa.selenium.WebElement
-import org.openqa.selenium.support.ui.WebDriverWait
+import org.openqa.selenium.interactions.*
 import java.io.File
 import java.text.SimpleDateFormat
-import java.time.Duration
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 /**
  * Classe com metodos de apoio, que otimizam a codificacao das classes de pagina
@@ -72,7 +67,8 @@ object Utils {
         return this.getAttribute("class").split(" ").contains(className)
     }
 
-    fun WebDriver.wait(seconds: Long) {
-        WebDriverWait(this, seconds)
+    fun Actions.dragAndHold(element: WebElement, xOffset: Int, yOffset: Int): Actions {
+        this.dragAndDropBy(element, xOffset, yOffset).build().perform()
+        return this.clickAndHold(element).moveByOffset(0, 1)
     }
 }
