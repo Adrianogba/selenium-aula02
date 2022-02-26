@@ -42,6 +42,7 @@ class GuruTest {
     fun registrar() {
         PageGuruRegister()
             .openPage(PageGuruRegister::class.java, "http://demo.guru99.com/test/newtours/register.php")
+            .guruRegister()
     }
 
     @Test

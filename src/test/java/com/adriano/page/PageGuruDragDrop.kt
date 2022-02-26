@@ -14,31 +14,30 @@ import org.openqa.selenium.support.ui.WebDriverWait
 
 class PageGuruDragDrop : CorePage<PageGuruDragDrop>() {
 
-    /** DICIONARIO
+    /** DICIONÁRIO
      * Draggable = bloquinho a ser movido
      * Container = bloco onde o bloquinho deve ser movido
      */
-
     @FindBy(xpath = "//*[@id=\"products\"]/div/ul")
-    private val draggables: WebElement? = null
+    private lateinit var  draggables: WebElement
 
     @FindBy(id = "amt7")
-    private val debitAmountContainer: WebElement? = null
+    private lateinit var  debitAmountContainer: WebElement
 
     @FindBy(id = "bank")
-    private val debitAcountContainer: WebElement? = null
+    private lateinit var  debitAcountContainer: WebElement
 
     @FindBy(id = "loan")
-    private val creditAmountContainer: WebElement? = null
+    private lateinit var  creditAmountContainer: WebElement
 
     @FindBy(id = "amt8")
-    private val creditAcountContainer: WebElement? = null
+    private lateinit var  creditAcountContainer: WebElement
 
     @FindBy(id = "equal")
-    private val successMessage: WebElement? = null
+    private lateinit var  successMessage: WebElement
 
     @FindBy(id = "e1")
-    private val cantMove: WebElement? = null
+    private lateinit var cantMove: WebElement
 
     /**
      * Lista dos containers
@@ -59,11 +58,10 @@ class PageGuruDragDrop : CorePage<PageGuruDragDrop>() {
      * Move os draggables aonde for possível
      */
     fun verifyAndMoveDraggables(): PageGuruDragDrop {
-        val draggables = draggables?.findElements(By.tagName("li"))
-            ?: throw NullPointerException()
         val action = Actions(driver)
         lateinit var dragAndDrop: Action
 
+        val draggables = draggables.findElements(By.tagName("li"))
         draggables.forEach { draggable ->
             getContainersDraggableCanBeMovedTo(draggable).forEach { container ->
                 dragAndDrop = action.clickAndHold(draggable)
