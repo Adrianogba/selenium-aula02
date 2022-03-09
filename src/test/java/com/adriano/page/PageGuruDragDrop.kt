@@ -83,7 +83,7 @@ class PageGuruDragDrop : CorePage<PageGuruDragDrop>() {
      * Informa se o desafio foi concluido
      */
     private fun hasFinished(): Boolean {
-        val successMessage = successMessage ?: return false
+        val successMessage = successMessage
         return successMessage.text == "Perfect!"
     }
 
@@ -106,7 +106,7 @@ class PageGuruDragDrop : CorePage<PageGuruDragDrop>() {
      * Informa se apareceu a mensagem quando um
      * draggable pode ser movido ou não a algum container
      */
-    private val cannotBeMoved: Boolean get() = cantMove?.isDisplayed == true
+    private val cannotBeMoved: Boolean get() = cantMove.isDisplayed
 
     /**
      * Retorna para um bloquinho a quais containers
@@ -123,8 +123,7 @@ class PageGuruDragDrop : CorePage<PageGuruDragDrop>() {
         val draggableContainers = mutableListOf<WebElement>()
 
         containers.forEach { container ->
-            if (container != null
-                && container.haveClass("content-active")
+            if (container.haveClass("content-active")
                 && !isDraggableAlreadyInContainer(draggable, container)
             )
                 draggableContainers.add(container)
